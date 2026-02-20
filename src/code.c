@@ -1,14 +1,14 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <sys/random.h>
+#include <stdlib.h>
 #include "../words.h"
+#include "../utils.h"
 
 /*add support for making sure getrandom works always with ssize_t or something*/
-
 #define uint unsigned int
 
+
 int main (int argc, char* argv[]) {
-	int num = 0; /* arg 1*/
 	const uint len1 = sizeof(words) / sizeof(words[0]);
 	const uint len2 = sizeof(marks) / sizeof(marks[0]);
 	const uint len3 = sizeof(basic) / sizeof(basic[0]);
@@ -17,34 +17,32 @@ int main (int argc, char* argv[]) {
 	uint r2 = 0; /* random value for marks */
 	uint r3 = 0; /* random value for basics */
 
-	int seed = 0; /* seed edited in for loop */
-	uint buf = 0; /* buffer for getrandom(), maybe use memory allocation for that sometime? */
+	uint seed = 0; /* seed edited in for loop */
+	uint num = 10;
 
-	if (argc == 2) { /* check to see if there are enough args */
-		int num = atoi(argv[1]); /* only sets it now to prevent checking argv[1] even if it doesnt exist */
-
-		if (num >= 1) { /* check to see if inputted number is valid */
-			for (int i = 0; i < num; i++) {
-				buf = getrandom(&seed, sizeof(seed), 0);
-				srand(seed);
-				r1 = rand() % len1; /* words */
-				r2 = rand() % len2; /* marks */
-				r3 = rand() % len3; /* basics */
-
-				printf(" %s %s", words[r1], basic[r3]); /* word printing */
-
-				if (rand() % 5 == 0) { /* mark printing */
-					printf("%s ", marks[r2]);
-				}
-			}
-			printf("\n--Wise words from the linux kernel...\n");
-			return 0;
-		} else {
-			printf("Error! Input is invalid or less than 1.\n");
-			return 2;
-		}
-	} else {
-		printf("Error! Did you type a number greater than 0 (if you typed an arg...)?\n");
+	if (argc == 2) num = atoi(argv[1]);
+	if (num < 1) {
+		printf("Invalid token count requested.\n");
 		return 1;
 	}
+
+	if (getFlagVal("--many", argv, argc) > 0) {
+		num = 500;
+	}
+
+	for (int i = 0; i < num; i++) {
+		getrandom(&seed, sizeof(seed), 0);
+		srand(seed);
+		r1 = rand() % len1; /* words */
+		r2 = rand() % len2; /* marks */
+		r3 = rand() % len3; /* basics */
+
+		printf("%s%s %s", (i == 0) ? "" : " " , words[r1], basic[r3]); /* word printing */
+
+		if (rand() % 5 == 0) { /* mark printing */
+			printf("%s ", marks[r2]);
+		}
+	}
+	printf("\n--Wise words from the linux kernel...\n");
+	return 0;
 }
