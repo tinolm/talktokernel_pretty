@@ -7,7 +7,6 @@
 /*add support for making sure getrandom works always with ssize_t or something*/
 #define uint unsigned int
 
-
 int main (int argc, char* argv[]) {
 	const uint len1 = sizeof(words) / sizeof(words[0]);
 	const uint len2 = sizeof(marks) / sizeof(marks[0]);
@@ -26,10 +25,9 @@ int main (int argc, char* argv[]) {
 		return 1;
 	}
 
-	if (getFlagVal("--many", argv, argc) > 0) {
-		num = 500;
-	}
+	if (getFlagVal("--many", argv, argc) > 0) num = -1;
 
+	system("clear");
 	for (int i = 0; i < num; i++) {
 		getrandom(&seed, sizeof(seed), 0);
 		srand(seed);
@@ -43,6 +41,7 @@ int main (int argc, char* argv[]) {
 			printf("%s ", marks[r2]);
 		}
 	}
-	printf("\n--Wise words from the linux kernel...\n");
+	printKernelAuthor();
+	system("date +%d.%m.%y");
 	return 0;
 }
